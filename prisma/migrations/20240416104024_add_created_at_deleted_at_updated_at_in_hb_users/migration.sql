@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "hb_users" ADD COLUMN     "user_created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN     "user_deleted_at" TIMESTAMP(3),
+ADD COLUMN     "user_updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

@@ -16,7 +16,7 @@ def register_auth_middleware(apps: FastAPI):
                         content={
                             "message": "Unauthorized"
                         },
-                        status_code=403               
+                        status_code=403             
                     )
             token:str = request.headers['authorization'].split(' ')[1]
             try:

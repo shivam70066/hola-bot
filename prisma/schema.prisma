@@ -8,14 +8,41 @@ datasource db {
 }
 
 model User {
-    id           Int       @id @default(autoincrement()) @map("user_id")
-    name         String    @map("user_name") @db.VarChar(255)
-    email        String    @unique @map("user_email") @db.VarChar(255)
-    password     String    @map("user_password")
-    phone_number String    @map("user_number")
-    created_at   DateTime  @default(now())
-    updated_at   DateTime  @default(now())
-    deleted_at   DateTime?
+    id            Int             @id @default(autoincrement()) @map("user_id")
+    name          String          @map("user_name") @db.VarChar(255)
+    email         String          @unique @map("user_email") @db.VarChar(255)
+    password      String          @map("user_password")
+    phone_number  String          @map("user_number")
+    conversations Conversations[]
+    created_at    DateTime        @default(now())
+    updated_at    DateTime        @default(now())
+    deleted_at    DateTime?
 
     @@map("hb_users")
+}
+
+model Conversations {
+    id         String              @id @unique @map("conversation_id")
+    title      String              @map("conversation_title")
+    user_id    Int                 @map("user_id")
+    user       User                @relation(fields: [user_id], references: [id])
+    messages   ConversationsData[]
+    created_at DateTime            @default(now())
+    updated_at DateTime            @default(now()) @updatedAt
+    deleted_at DateTime?
+
+    @@map("hb_conversations")
+}
+
+model ConversationsData {
+    id              Int           @unique @default(autoincrement()) @map("cd_id")
+    question        String?       @map("cd_question")
+    response        String?       @map("cd_response")
+    conversation_id String
+    conversation    Conversations @relation(fields: [conversation_id], references: [id])
+    created_at      DateTime      @default(now())
+    updated_at      DateTime      @default(now()) @updatedAt
+    deleted_at      DateTime?
+
+    @@map("hb_coversations_data")
 }

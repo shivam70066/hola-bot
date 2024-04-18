@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Path
+from fastapi import APIRouter
+from app.schemas.login_schema import LoginData, LoginResponse
 from ..services.users_services import UserService
 from ..schemas.signup_schema import SignUpData,SignUpResponse
 
@@ -11,3 +12,9 @@ router = APIRouter(
 async def signup(userData: SignUpData):
     data = await UserService.createUser(userData)
     return SignUpResponse(message="Successfully Created.")
+
+@router.post("/login",response_model=LoginResponse)
+async def login(userData: LoginData):
+    data = await UserService.checkCredentials(userData)
+    return LoginResponse(message="Logged in successfully",token=data)
+    

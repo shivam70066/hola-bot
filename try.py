@@ -10,6 +10,8 @@ bot_response = client.chat.completions.create(
   ]
 )
 
+
+
 print(bot_response.choices[0].message)
 
 # def chat_with_gpt(prompt):
@@ -28,3 +30,20 @@ print(bot_response.choices[0].message)
     
 #         response = chat_with_gpt(user_input)
 #         print("Chatbot: ", response)
+
+
+
+from langchain.vectorstores import Weaviate
+from weaviate import Client
+
+client = Client('http://localhost:8080')
+vector_store = Weaviate(client, "new", text_key="text")
+
+data = [
+    {"text": "This is the first document."},
+    {"text": "This is the second document."},
+    {"text": "This is the third document."}
+]
+
+ids = vector_store.add_texts(texts=[d["text"] for d in data])
+print(ids)

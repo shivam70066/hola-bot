@@ -17,6 +17,7 @@ model User {
     created_at    DateTime        @default(now())
     updated_at    DateTime        @default(now())
     deleted_at    DateTime?
+    Data          UserData[]
 
     @@map("hb_users")
 }
@@ -45,4 +46,14 @@ model ConversationsData {
     deleted_at      DateTime?
 
     @@map("hb_coversations_data")
+}
+
+model UserData {
+    id         String   @id @default(uuid()) @map("data_id")
+    source     String   @db.VarChar(450) @map("data_source")
+    datachunks String[] @map("data_chunks")
+    user       User     @relation(fields: [userId], references: [id])
+    userId     Int      @map("user_id")
+
+    @@map("hb_user_data")
 }

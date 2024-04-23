@@ -8,7 +8,7 @@ def register_auth_middleware(apps: FastAPI):
     async def auth_middlware(request: Request, call_next):
         
         path = request.url.path.split('/')
-        if 'auth' in path or 'docs' in path or 'redoc' in path or 'openapi.json' in path or 'healthcheck' in path:
+        if 'auth' in path or 'docs' in path or 'redoc' in path or 'openapi.json' in path or 'healthcheck' in path or 'user_data' in path:
             pass
         else:
             if not request.headers.get("authorization"):

@@ -48,12 +48,8 @@ articles = client.collections.get("newDoc")
 #     "src" : "learn Java"
 # })
 # print(uid)
-response = articles.query.near_text(
-    query="jva",
-    limit=20,
-    return_metadata=MetadataQuery(distance=True)
-)
-print(response.objects)  # Inspect the first object
+response = articles.query.fetch_object_by_id(uuid="262ada32-7e47-44ca-bae8-32b5d84f5ec1")
+print(response)  # Inspect the first object
 
 # print(articles.data.delete_by_id('3d253b4e-72d6-40fd-860c-37597a9cea11'))
 

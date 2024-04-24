@@ -51,7 +51,7 @@
 # pages = loader.loader()
 # print(pages[0])
 
-from custom_loader import CustomLoader
+from app.utils.custom_loader import CustomLoader
 import weaviate
 import os
 from dotenv import load_dotenv  

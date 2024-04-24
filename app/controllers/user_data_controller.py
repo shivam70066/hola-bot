@@ -1,11 +1,8 @@
-from fastapi import APIRouter, FastAPI, File, UploadFile
-from app.schemas.login_schema import LoginData, LoginResponse
-from ..services.users_services import UserService
-from ..schemas.signup_schema import SignUpData,SignUpResponse
-import pdfplumber
-import tempfile
+from fastapi import APIRouter, FastAPI, File, UploadFile,Request, HTTPException
 import os
 import shutil
+from app.utils import ingestion,egression
+from ..services.user_data_services import UserDataServices
 
 
 router = APIRouter(
@@ -14,35 +11,47 @@ router = APIRouter(
 )
 
 @router.post("")
-async def signup(file: UploadFile = File(...)):
-    # file_extension = file.filename.split(".")[-1]
-    file_extension = os.path.splitext(file.filename)[1]
-    with tempfile.NamedTemporaryFile(dir="",delete=False, suffix=file_extension) as temp:
-        temp_file_path = file.filename
-        
-
-        # Save the uploaded file to the temporary file
-    with open(temp_file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    # if file.filename.endswith(".pdf"):
-    #     with pdfplumber.open(file.file) as pdf:
-            
-    #         contents = ""
-    #         for page in pdf.pages:
-    #             contents += page.extract_text()
-
-    #     print(contents)
-    # else:
-    #     # Read file contents as bytes
-    #     contents = await file.read()
-    #     print(contents.decode('utf-8'))
+async def saveData(request: Request,file: UploadFile = File(...)):
+    TEMP_DIR = ""
+    temp_file_path = os.path.join(TEMP_DIR, file.filename)
     
+    with open(temp_file_path, "wb") as temp:
+        shutil.copyfileobj(file.file, temp)
+    
+    ids = ingestion.ingestData(temp_file_path)
+    details = await UserDataServices.saveUserdata(file.filename,request.state.user_id,ids)
+    
+    print(details)
     os.remove(temp_file_path)
         
         
-    return {"filename": file.filename, "temp_file_path": temp_file_path}
+    return {"status": "Inserted successfully"}
 
 
+@router.get("/sources")
+async def getSources(request: Request):
+    
+    sources = await UserDataServices.getSources(request.state.user_id) 
+    print(sources)
+        
+        
+    return {"user_id":request.state.user_id,"sources":sources}
 
+
+@router.delete("/delete")
+async def getSources(request: Request,src_id:str):
+    user_id = request.state.user_id
+    # sources = await UserDataServices.getSources(request.state.user_id) 
+    # print(sources)
+    sourceChunksIDs = await UserDataServices.getSourceChunksIds(user_id,src_id)
+    if sourceChunksIDs is None:
+        raise HTTPException(status_code=404, detail="No Source data is associated with this id")
+    egression.deleteData(sourceChunksIDs)
+    
+    isDeleted = await UserDataServices.deleteSource(src_id)
+    
+    if isDeleted is False:
+        raise HTTPException(status_code=404, detail="No Source data is associated with this id")
+    
+    return {"detail": f'Source data is deleted with id: {src_id}'}
      

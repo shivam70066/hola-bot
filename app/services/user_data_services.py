@@ -33,7 +33,7 @@ class UserDataServices:
                 "id": srcId
             }
         )
-        datachunks= None
+        datachunks = None
         for data in sourceData:
             datachunks = data.datachunks
         return datachunks

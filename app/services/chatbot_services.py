@@ -5,6 +5,7 @@ from ..repository import user_repo
 from ..schemas.signup_schema import SignUpData
 from configs.settings import settings
 from configs.database_connection import prisma_connection
+from langchain_core.messages import HumanMessage, AIMessage
 
 class ChatBotService:
     
@@ -44,7 +45,8 @@ class ChatBotService:
                 "user_id":user_id
             }
         )
-        
+    
+    @staticmethod
     async def getConversationData(chat_id: str):
         conversation_data = await prisma_connection.prisma.conversationsdata.find_many(
     where={"conversation_id": chat_id},
@@ -58,6 +60,33 @@ class ChatBotService:
             for item in conversation_data:
                 formatted_data.append({"role": "user", "content": item.question})
                 formatted_data.append({"role": "assistant", "content": item.response})
+
+            return formatted_data
+        
+    @staticmethod
+    async def getConversationDataForHistory(chat_id: str):
+        count = await prisma_connection.prisma.conversationsdata.count(
+            where={"conversation_id": chat_id},
+        )
+        if count <= 10:
+            conversation_data = await prisma_connection.prisma.conversationsdata.find_many(
+                where={"conversation_id": chat_id},
+                
+            )
+        else:
+            conversation_data = await prisma_connection.prisma.conversationsdata.find_many(
+                where={"conversation_id": chat_id},
+                skip= count-10
+            )
+            
+        
+        if not conversation_data:
+            return []
+        else:
+            formatted_data = []
+            for item in conversation_data:
+                formatted_data.append(HumanMessage(content=item.question))
+                formatted_data.append(AIMessage(content=item.response))
 
             return formatted_data
     

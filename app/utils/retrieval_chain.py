@@ -46,7 +46,7 @@ def retrieval_chain(question:str,userID:int,chat_history:any):
     )
     llm = ChatOpenAI(api_key=settings.OPEN_API_KEY)
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "Answer the user's questions based on the below context only and if user asked about any other thing tell them you don't know:\n\n{context}"),
+        ("system", "Answer the user's questions based on the below context and history and if user asked about any other thing tell them you don't know:\n\n{context}"),
         MessagesPlaceholder(variable_name="chat_history"),
         ("user", "{input}"),
     ])
